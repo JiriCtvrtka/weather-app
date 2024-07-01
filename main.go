@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 	"os"
@@ -21,10 +23,11 @@ type weatherCurrent struct {
 }
 
 type weather struct {
-	Lat      float64        `json:"lat"`
-	Lon      float64        `json:"lon"`
-	Timezone string         `json:"timezone"`
-	Current  weatherCurrent `json:"current"`
+	Lat      float64          `json:"lat"`
+	Lon      float64          `json:"lon"`
+	Timezone string           `json:"timezone"`
+	Current  weatherCurrent   `json:"current"`
+	Hourly   []weatherCurrent `json:"hourly"`
 }
 
 func main() {
@@ -59,5 +62,29 @@ func main() {
 		return
 	}
 
-	fmt.Printf("%+v", scrapedData)
+	t, err := template.ParseFiles("./template.html")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	buf := new(bytes.Buffer)
+	err = t.Execute(buf, scrapedData)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write(buf.Bytes())
+	})
+
+	srv := &http.Server{
+		Addr:         ":8888",
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		fmt.Println(err)
+	}
 }

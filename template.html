@@ -1,0 +1,11 @@
+<html>
+    <head></head>
+    <body>
+        {{range .Hourly}}
+            {{range .Weather}}
+            <div>{{.Status}}</div>
+            <div>{{.Description}}</div>
+            {{end}}
+        {{end}}
+    </body>
+</html>
