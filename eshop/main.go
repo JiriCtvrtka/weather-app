@@ -2,11 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"eshop/router"
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -92,4 +95,17 @@ func main() {
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
 	}
+
+	router.Routing()
+
+	srv := &http.Server{
+		Addr:         ":8888",
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		fmt.Println(err)
+	}
+
 }
