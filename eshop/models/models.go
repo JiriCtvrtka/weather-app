@@ -1,8 +1,8 @@
 package models
 
 type UserType struct {
-	firstname, lastname, username, password, email, city, street, number, additional_info string
-	zipcode, age                                                                          int64
+	Firstname, Lastname, Username, Password, Email, City, Street, Number, AdditionalInfo string
+	Zipcode, Age                                                                         int64
 }
 
 type ProductType struct {
@@ -12,9 +12,9 @@ type ProductType struct {
 }
 
 type OrdersType struct {
-	id, username                string
-	items                       string
-	status, delivery            string
-	delivery_price, total_price float64
-	currency                    string
+	Id, Username              string
+	Items                     string
+	Status, Delivery          string
+	DeliveryPrice, TotalPrice float64
+	Currency                  string
 }
