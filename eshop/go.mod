@@ -1,4 +1,4 @@
-module eshop
+module github.com/weather-app/eshop
 
 go 1.22.5
 
