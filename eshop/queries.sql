@@ -79,6 +79,15 @@ VALUES
   ('P433','TV2', 'desc2', 'euro', 7, 100.56);
 
 
+DROP TABLE products_json;
+CREATE TABLE products_json (
+  id VARCHAR(255) PRIMARY KEY,
+  values JSONB
+);
+INSERT INTO products_json (id, values) VALUES
+('P432', '{"name": "TV1", "description": "desc3", "currency": "euro", "count": 5, "price": 5.4}');
+SELECT values->>'name' as XXX FROM products_json;
+
 /*
 ORDERS
 
