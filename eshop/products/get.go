@@ -3,8 +3,8 @@ package products
 import (
 	"log"
 
-	"eshop/db"
-	"eshop/models"
+	"github.com/weather-app/eshop/db"
+	"github.com/weather-app/eshop/models"
 )
 
 func StaticWay() []models.ProductType {

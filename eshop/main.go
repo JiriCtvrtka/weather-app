@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"eshop/router"
+	"github.com/weather-app/eshop/router"
 
 	_ "github.com/lib/pq"
 )

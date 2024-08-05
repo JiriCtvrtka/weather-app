@@ -5,7 +5,7 @@ import (
 
 	"net/http"
 
-	"eshop/products"
+	"github.com/weather-app/eshop/products"
 )
 
 func Routing() {
