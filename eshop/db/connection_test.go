@@ -24,3 +24,11 @@ func TestDB(t *testing.T) {
 	_, err = db.Exec("DROP TABLE test")
 	require.NoError(t, err)
 }
+
+func BenchmarkDB(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		db, err := Connection()
+		require.NoError(b, err)
+		defer db.Close()
+	}
+}
