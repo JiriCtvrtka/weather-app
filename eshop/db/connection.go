@@ -5,6 +5,8 @@ import (
 	"net"
 	"net/url"
 	"strconv"
+
+	_ "github.com/lib/pq"
 )
 
 func Connection() (*sql.DB, error) {
