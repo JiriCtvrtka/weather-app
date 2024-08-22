@@ -6,9 +6,14 @@ type UserType struct {
 }
 
 type ProductType struct {
-	Id, Name, Description, Currency string
-	Count                           int64
-	Price                           float64
+	Id string
+	CreateProduct
+}
+
+type CreateProduct struct {
+	Name, Description, Currency string
+	Count                       int64
+	Price                       float64
 }
 
 type OrdersType struct {

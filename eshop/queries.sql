@@ -59,7 +59,7 @@ PRODUCTS
 
 
 CREATE TABLE products (
-  id VARCHAR(255) PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(255),
   description VARCHAR(255),
   currency VARCHAR(255),
@@ -68,15 +68,15 @@ CREATE TABLE products (
 );
 
 
-INSERT INTO products (id,
+INSERT INTO products (
   name,
   description,
   currency,
   count,
   price)
 VALUES 
-	('P432','TV1', 'desc1', 'euro', 4, 78.9),
-  ('P433','TV2', 'desc2', 'euro', 7, 100.56);
+	('TV1', 'desc1', 'euro', 4, 78.9),
+  ('TV2', 'desc2', 'euro', 7, 100.56);
 
 
 DROP TABLE products_json;
