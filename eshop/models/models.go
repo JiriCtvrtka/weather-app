@@ -7,10 +7,10 @@ type UserType struct {
 
 type ProductType struct {
 	Id string
-	CreateProduct
+	ProductCore
 }
 
-type CreateProduct struct {
+type ProductCore struct {
 	Name, Description, Currency string
 	Count                       int64
 	Price                       float64

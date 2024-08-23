@@ -8,7 +8,7 @@ import (
 	"github.com/weather-app/eshop/models"
 )
 
-func StaticWay() []models.ProductType {
+func StaticWay(id string) []models.ProductType {
 	db, err := db.Connection()
 
 	if err != nil {
@@ -16,7 +16,12 @@ func StaticWay() []models.ProductType {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT * FROM products")
+	query := "SELECT * FROM products"
+	if id != "" {
+		query = fmt.Sprintf("%s WHERE id = '%s'", query, id)
+	}
+
+	rows, err := db.Query(query)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -7,7 +7,7 @@ import (
 	"github.com/weather-app/eshop/models"
 )
 
-func Create(item models.CreateProduct) (int64, error) {
+func Create(item models.ProductCore) (int64, error) {
 	db, err := db.Connection()
 	if err != nil {
 		fmt.Println(err)
