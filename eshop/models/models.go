@@ -17,7 +17,11 @@ type ProductCore struct {
 }
 
 type OrdersType struct {
-	Id, Username              string
+	Id string
+	OrdersCore
+}
+type OrdersCore struct {
+	Username                  string
 	Items                     string
 	Status, Delivery          string
 	DeliveryPrice, TotalPrice float64

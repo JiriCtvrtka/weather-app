@@ -104,7 +104,7 @@ ORDERS
 */
 
 CREATE TABLE orders (
-  id VARCHAR(255) PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   username VARCHAR(255),
   items JSONB,
   status VARCHAR(255),
@@ -115,7 +115,7 @@ CREATE TABLE orders (
 );
 
 
-INSERT INTO orders (id,
+INSERT INTO orders (
   username,
   items,
   status,
@@ -124,5 +124,5 @@ INSERT INTO orders (id,
   total_price,
   currency)              
 VALUES 
-	('O1','janedoe1', '{"P432": 1}', 'In Progress', 'Easybox', 10, 700, 'euro'),
-  ('O2','johndoe', '{"P432": 1,"P433": 1}', 'Finished', 'DPD', 10, 999.9, 'usd');
+	('janedoe1', '{"P432": 1}', 'In Progress', 'Easybox', 10, 700, 'euro'),
+  ('johndoe', '{"P432": 1,"P433": 1}', 'Finished', 'DPD', 10, 999.9, 'usd');
