@@ -16,12 +16,7 @@ func StaticWay(username string) []models.UserType {
 	}
 	defer db.Close()
 
-	query := "SELECT * FROM users"
-	if username != "" {
-		query = fmt.Sprintf("%s WHERE username = '%s'", query, username)
-	}
-
-	rows, err := db.Query(query)
+	rows, err := db.Query("SELECT * FROM users WHERE username = $1", username)
 	if err != nil {
 		log.Fatal(err)
 	}

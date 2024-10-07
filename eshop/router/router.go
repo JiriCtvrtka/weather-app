@@ -122,7 +122,7 @@ func Routing() {
 	})
 
 	http.HandleFunc("/orders", func(w http.ResponseWriter, r *http.Request) {
-		orders := utils.DynamicWay("orders") // add param to handle func
+		orders := utils.DynamicWay("orders")
 		bytes, err := json.Marshal(orders)
 
 		if err != nil {
@@ -195,7 +195,7 @@ func Routing() {
 	})
 
 	http.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
-		users := utils.DynamicWay("users") // add param to handle func
+		users := utils.DynamicWay("users")
 		bytes, err := json.Marshal(users)
 
 		if err != nil {

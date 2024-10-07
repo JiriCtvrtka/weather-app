@@ -1,14 +1,12 @@
 package utils
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/weather-app/eshop/db"
 )
 
 func DynamicWay(table string) []map[string]any {
-	fmt.Println("dinamic")
 	db, err := db.Connection()
 	if err != nil {
 		log.Fatal(err)
