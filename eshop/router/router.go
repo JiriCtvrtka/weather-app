@@ -20,10 +20,6 @@ func prefailedCondition(w http.ResponseWriter, err error) {
 }
 
 func Routing() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello!"))
-	})
-
 	http.HandleFunc("/products-static", func(w http.ResponseWriter, r *http.Request) {
 		products := products.StaticWay("")
 		bytes, err := json.Marshal(products)
@@ -265,5 +261,10 @@ func Routing() {
 			w.Write([]byte("OK"))
 		}
 	})
+
+	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "build/index.html") })
+
+	fs := http.FileServer(http.Dir("build"))
+	http.Handle("/react/", http.StripPrefix("/react/", fs))
 
 }
