@@ -6,16 +6,8 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/gorilla/websocket"
+	"golang.org/x/net/websocket"
 )
-
-// WebSocket upgrader
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		// Allow all origins for simplicity, customize for production
-		return true
-	},
-}
 
 // Connected clients
 var clients = make(map[*websocket.Conn]bool)
@@ -26,7 +18,7 @@ var messageHistory = []string{}
 var historyMutex = &sync.Mutex{}
 
 // Broadcast messages to all clients
-func broadcastMessage(messageType int, message []byte) {
+func broadcastMessage(message []byte) {
 	historyMutex.Lock()
 	messageHistory = append(messageHistory, string(message))
 	historyMutex.Unlock()
@@ -34,7 +26,7 @@ func broadcastMessage(messageType int, message []byte) {
 	clientsMutex.Lock()
 	defer clientsMutex.Unlock()
 	for client := range clients {
-		err := client.WriteMessage(messageType, message)
+		err := client.WriteMessage(websocket.TextMessage, message)
 		if err != nil {
 			fmt.Printf("Error broadcasting to client: %v\n", err)
 			client.Close()
@@ -44,23 +36,16 @@ func broadcastMessage(messageType int, message []byte) {
 }
 
 // WebSocket handler
-func wsHandler(w http.ResponseWriter, r *http.Request) {
-	// Upgrade HTTP to WebSocket
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		fmt.Printf("Failed to upgrade connection: %v\n", err)
-		return
-	}
-	defer conn.Close()
-
+func wsHandler(ws *websocket.Conn) {
+	// Register client
 	clientsMutex.Lock()
-	clients[conn] = true
+	clients[ws] = true
 	clientsMutex.Unlock()
 
 	// Send message history to the newly connected client
 	historyMutex.Lock()
 	for _, msg := range messageHistory {
-		err = conn.WriteMessage(websocket.TextMessage, []byte(msg))
+		err := websocket.Message.Send(ws, msg)
 		if err != nil {
 			fmt.Printf("Error sending history to client: %v\n", err)
 			break
@@ -70,22 +55,24 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Client connected")
 
+	// Read messages from the WebSocket connection
 	for {
-		// Read message from client
-		messageType, message, err := conn.ReadMessage()
+		var msg string
+		err := websocket.Message.Receive(ws, &msg)
 		if err != nil {
 			fmt.Printf("Error reading message: %v\n", err)
 			break
 		}
 
-		fmt.Printf("Received: %s\n", message)
+		fmt.Printf("Received: %s\n", msg)
 
 		// Broadcast message to all connected clients
-		broadcastMessage(messageType, message)
+		broadcastMessage([]byte(msg))
 	}
 
+	// Deregister client
 	clientsMutex.Lock()
-	delete(clients, conn)
+	delete(clients, ws)
 	clientsMutex.Unlock()
 }
 
@@ -111,7 +98,9 @@ func htmlHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/ws", wsHandler)   // WebSocket endpoint
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		websocket.Handler(wsHandler).ServeHTTP(w, r)
+	}) // WebSocket endpoint
 	http.HandleFunc("/api", apiHandler) // Simple REST API endpoint
 	http.HandleFunc("/", htmlHandler)   // HTML page for WebSocket connection
 
