@@ -20,8 +20,16 @@ var upgrader = websocket.Upgrader{
 var clients = make(map[*websocket.Conn]bool)
 var clientsMutex = &sync.Mutex{}
 
+// Message history
+var messageHistory = []string{}
+var historyMutex = &sync.Mutex{}
+
 // Broadcast messages to all clients
 func broadcastMessage(messageType int, message []byte) {
+	historyMutex.Lock()
+	messageHistory = append(messageHistory, string(message))
+	historyMutex.Unlock()
+
 	clientsMutex.Lock()
 	defer clientsMutex.Unlock()
 	for client := range clients {
@@ -47,6 +55,17 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	clientsMutex.Lock()
 	clients[conn] = true
 	clientsMutex.Unlock()
+
+	// Send message history to the newly connected client
+	historyMutex.Lock()
+	for _, msg := range messageHistory {
+		err = conn.WriteMessage(websocket.TextMessage, []byte(msg))
+		if err != nil {
+			fmt.Printf("Error sending history to client: %v\n", err)
+			break
+		}
+	}
+	historyMutex.Unlock()
 
 	fmt.Println("Client connected")
 
