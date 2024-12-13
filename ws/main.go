@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,6 +16,24 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+// Connected clients
+var clients = make(map[*websocket.Conn]bool)
+var clientsMutex = &sync.Mutex{}
+
+// Broadcast messages to all clients
+func broadcastMessage(messageType int, message []byte) {
+	clientsMutex.Lock()
+	defer clientsMutex.Unlock()
+	for client := range clients {
+		err := client.WriteMessage(messageType, message)
+		if err != nil {
+			fmt.Printf("Error broadcasting to client: %v\n", err)
+			client.Close()
+			delete(clients, client)
+		}
+	}
+}
+
 // WebSocket handler
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	// Upgrade HTTP to WebSocket
@@ -24,6 +43,10 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
+
+	clientsMutex.Lock()
+	clients[conn] = true
+	clientsMutex.Unlock()
 
 	fmt.Println("Client connected")
 
@@ -37,13 +60,13 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Received: %s\n", message)
 
-		// Echo message back to client
-		err = conn.WriteMessage(messageType, message)
-		if err != nil {
-			fmt.Printf("Error writing message: %v\n", err)
-			break
-		}
+		// Broadcast message to all connected clients
+		broadcastMessage(messageType, message)
 	}
+
+	clientsMutex.Lock()
+	delete(clients, conn)
+	clientsMutex.Unlock()
 }
 
 // Simple HTTP endpoint
