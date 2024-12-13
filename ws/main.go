@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"sync"
 
@@ -97,46 +98,16 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 
 // HTML page for WebSocket connection
 func htmlHandler(w http.ResponseWriter, r *http.Request) {
-	html := `<!DOCTYPE html>
-<html>
-<head>
-	<title>WebSocket Test</title>
-	<script>
-		let ws;
-		function connect() {
-			ws = new WebSocket("ws://" + window.location.host + "/ws");
-
-			ws.onmessage = function(event) {
-				document.getElementById("messages").innerText += "\n" + event.data;
-			};
-
-			ws.onopen = function() {
-				console.log("WebSocket connection opened");
-			};
-
-			ws.onclose = function() {
-				console.log("WebSocket connection closed");
-			};
-		}
-
-		function sendMessage() {
-			const message = document.getElementById("messageInput").value;
-			ws.send(message);
-		}
-	</script>
-</head>
-<body>
-	<h1>WebSocket Test</h1>
-	<button onclick="connect()">Connect</button><br><br>
-	<input id="messageInput" type="text" placeholder="Enter message">
-	<button onclick="sendMessage()">Send</button>
-	<pre id="messages"></pre>
-</body>
-</html>`
+	tmpl, err := template.ParseFiles("html/index.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Error loading template: %v", err)
+		return
+	}
 
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(html))
+	tmpl.Execute(w, nil)
 }
 
 func main() {
